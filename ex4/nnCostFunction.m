@@ -98,6 +98,46 @@ J = J + (sum(sum(Theta1(:,2:end) .^ 2)) +
 %               over the training examples if you are implementing it for the
 %               first time.
 %
+
+for t = 1:m
+  % Step 1: Perform feedfoward pass
+  # Set input layer values
+  a_1 = X(t,:)';
+  a_1 = [1; a_1];
+
+  # Do feedfoward
+  # Hidden layer
+  z_2 = Theta1 * a_1;
+  a_2 = sigmoid(z_2);
+  a_2 = [1; a_2];
+
+  # Ouput layer
+  z_3 = Theta2 * a_2;
+  a_3 = sigmoid(z_3);
+
+  % Step 2: Get error for layer 3
+  yt = yvals(t,:)';
+  delta_3 = a_3 - yt;
+
+  % Step 3: Get erroro for layer 2
+  delta_2 = (Theta2' * delta_3) .* sigmoidGradient([1; z_2]);
+
+  % Step 4: Accumulate gradient, skipping delta_2(0)
+  delta_2 = delta_2(2:end);
+
+  delta_t_2 = delta_3 * a_2';
+  delta_t_1 = delta_2 * a_1';
+
+  # Add gradients for this example to Theta gradients
+  Theta2_grad = Theta2_grad + delta_t_2;
+  Theta1_grad = Theta1_grad + delta_t_1;
+end
+
+% Step 5: Get unregularized gradient
+Theta1_grad = (1/m) * Theta1_grad;
+Theta2_grad = (1/m) * Theta2_grad;
+
+
 % Part 3: Implement regularization with the cost function and gradients.
 %
 %         Hint: You can implement this around the code for
@@ -106,15 +146,8 @@ J = J + (sum(sum(Theta1(:,2:end) .^ 2)) +
 %               and Theta2_grad from Part 2.
 %
 
-
-
-
-
-
-
-
-
-
+Theta1_grad(:, 2:end) = Theta1_grad(:, 2:end) + (lambda / m) * Theta1(:, 2:end);
+Theta2_grad(:, 2:end) = Theta2_grad(:, 2:end) + (lambda / m) * Theta2(:, 2:end);
 
 
 % -------------------------------------------------------------
